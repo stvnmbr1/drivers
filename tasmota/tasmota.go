@@ -1,4 +1,4 @@
-package tplink
+package tasmota
 
 import (
 	"encoding/json"
