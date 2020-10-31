@@ -13,14 +13,14 @@ import (
 
 const addressParam = "Address"
 
-type HS103Plug struct {
+type Tasmota struct {
 	state   bool
 	command *cmd
 	meta    hal.Metadata
 }
 
-func newHS103Plug(addr string, meta hal.Metadata) *HS103Plug {
-	return &HS103Plug{
+func newTasmota(addr string, meta hal.Metadata) *Tasmota {
+	return &Tasmota{
 		meta: meta,
 		command: &cmd{
 			addr: addr,
@@ -31,10 +31,10 @@ func newHS103Plug(addr string, meta hal.Metadata) *HS103Plug {
 	}
 }
 
-func (p *HS103Plug) SetFactory(cf ConnectionFactory) {
+func (p *Tasmota) SetFactory(cf ConnectionFactory) {
 	p.command.cf = cf
 }
-func (p *HS103Plug) On() error {
+func (p *Tasmota) On() error {
 	cmd := new(CmdRelayState)
 	cmd.System.RelayState.State = 1
 	if _, err := p.command.Execute(cmd, false); err != nil {
@@ -44,7 +44,7 @@ func (p *HS103Plug) On() error {
 	return nil
 }
 
-func (p *HS103Plug) Off() error {
+func (p *Tasmota) Off() error {
 	cmd := new(CmdRelayState)
 	cmd.System.RelayState.State = 0
 	if _, err := p.command.Execute(cmd, false); err != nil {
@@ -54,7 +54,7 @@ func (p *HS103Plug) Off() error {
 	return nil
 }
 
-func (p *HS103Plug) Info() (*Sysinfo, error) {
+func (p *Tasmota) Info() (*Sysinfo, error) {
 	buf, err := p.command.Execute(new(Plug), true)
 	if err != nil {
 		return nil, err
@@ -66,43 +66,43 @@ func (p *HS103Plug) Info() (*Sysinfo, error) {
 	return &d.System.Sysinfo, nil
 }
 
-func (p *HS103Plug) Metadata() hal.Metadata {
+func (p *Tasmota) Metadata() hal.Metadata {
 	return p.meta
 }
 
-func (p *HS103Plug) Name() string {
+func (p *Tasmota) Name() string {
 	return p.meta.Name
 }
 
-func (p *HS103Plug) Number() int {
+func (p *Tasmota) Number() int {
 	return 0
 }
-func (p *HS103Plug) DigitalOutputPins() []hal.DigitalOutputPin {
+func (p *Tasmota) DigitalOutputPins() []hal.DigitalOutputPin {
 	return []hal.DigitalOutputPin{p}
 }
 
-func (p *HS103Plug) DigitalOutputPin(i int) (hal.DigitalOutputPin, error) {
+func (p *Tasmota) DigitalOutputPin(i int) (hal.DigitalOutputPin, error) {
 	if i != 0 {
 		return nil, fmt.Errorf("invalid pin: %d", i)
 	}
 	return p, nil
 }
 
-func (p *HS103Plug) Write(state bool) error {
+func (p *Tasmota) Write(state bool) error {
 	if state {
 		return p.On()
 	}
 	return p.Off()
 }
 
-func (p *HS103Plug) LastState() bool {
+func (p *Tasmota) LastState() bool {
 	return p.state
 }
 
-func (p *HS103Plug) Close() error {
+func (p *Tasmota) Close() error {
 	return nil
 }
-func (p *HS103Plug) Pins(cap hal.Capability) ([]hal.Pin, error) {
+func (p *Tasmota) Pins(cap hal.Capability) ([]hal.Pin, error) {
 	switch cap {
 	case hal.DigitalOutput:
 		return []hal.Pin{p}, nil
@@ -111,22 +111,22 @@ func (p *HS103Plug) Pins(cap hal.Capability) ([]hal.Pin, error) {
 	}
 }
 
-type hs103Factory struct {
+type tasmotaFactory struct {
 	meta       hal.Metadata
 	parameters []hal.ConfigParameter
 }
 
-var factory103 *hs103Factory
-var hs103once sync.Once
+var factorytasmota *tasmotaFactory
+var tasmotaonce sync.Once
 
 // HS103Factory returns a singleton HS103 Driver factory
-func HS103Factory() hal.DriverFactory {
+func TASMOTAFactory() hal.DriverFactory {
 
-	hs103once.Do(func() {
-		factory103 = &hs103Factory{
+	tasmotaonce.Do(func() {
+		factorytasmota = &tasmotaFactory{
 			meta: hal.Metadata{
-				Name:        "tplink-hs103",
-				Description: "tplink hs103 series smart plug driver",
+				Name:        "Tasmota",
+				Description: "Tasmota",
 				Capabilities: []hal.Capability{
 					hal.DigitalOutput,
 				},
@@ -142,18 +142,18 @@ func HS103Factory() hal.DriverFactory {
 		}
 	})
 
-	return factory103
+	return factorytasmota
 }
 
-func (f *hs103Factory) Metadata() hal.Metadata {
+func (f *tasmotaFactory) Metadata() hal.Metadata {
 	return f.meta
 }
 
-func (f *hs103Factory) GetParameters() []hal.ConfigParameter {
+func (f *tasmotaFactory) GetParameters() []hal.ConfigParameter {
 	return f.parameters
 }
 
-func (f *hs103Factory) ValidateParameters(parameters map[string]interface{}) (bool, map[string][]string) {
+func (f *tasmotaFactory) ValidateParameters(parameters map[string]interface{}) (bool, map[string][]string) {
 
 	var failures = make(map[string][]string)
 
@@ -171,12 +171,12 @@ func (f *hs103Factory) ValidateParameters(parameters map[string]interface{}) (bo
 	return len(failures) == 0, failures
 }
 
-func (f *hs103Factory) NewDriver(parameters map[string]interface{}, _ interface{}) (hal.Driver, error) {
+func (f *tasmotaFactory) NewDriver(parameters map[string]interface{}, _ interface{}) (hal.Driver, error) {
 	if valid, failures := f.ValidateParameters(parameters); !valid {
 		return nil, errors.New(hal.ToErrorString(failures))
 	}
 
 	addr := parameters[addressParam].(string)
 
-	return newHS103Plug(addr, f.meta), nil
+	return newTasmota(addr, f.meta), nil
 }
