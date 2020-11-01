@@ -1,0 +1,35 @@
+{
+	"StatusSTS": {
+		"Time": "2020-11-01T18:49:46",
+		"Uptime": "0T00:01:17",
+		"UptimeSec": 77,
+		"Heap": 24,
+		"SleepMode": "Dynamic",
+		"Sleep": 10,
+		"LoadAvg": 99,
+		"MqttCount": 0,
+		"POWER1": "ON",
+		"POWER2": "OFF",
+		"POWER3": "ON",
+		"Channel3": 15,
+		"POWER4": "OFF",
+		"Channel4": 30,
+		"POWER5": "OFF",
+		"Channel5": 35,
+		"POWER6": "OFF",
+		"Channel6": 40,
+		"POWER7": "ON",
+		"Channel7": 45,
+		"Color": "2603030303",
+		"Wifi": {
+			"AP": 1,
+			"SSId": "ssid",
+			"BSSId": "mac",
+			"Channel": 1,
+			"RSSI": 76,
+			"Signal": -62,
+			"LinkCount": 1,
+			"Downtime": "0T00:00:03"
+		}
+	}
+}
