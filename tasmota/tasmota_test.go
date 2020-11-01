@@ -1,12 +1,12 @@
-package tplink
+package tasmota
 
 import (
 	"github.com/reef-pi/hal"
 	"testing"
 )
 
-func TestHS103Plug(t *testing.T) {
-	p := newHS103Plug("127.0.0.1:9999", hal.Metadata{})
+func TestTasmota(t *testing.T) {
+	p := newTasmota("127.0.0.1", hal.Metadata{})
 	nop := NewNop()
 	nop.Buffer([]byte(`{}`))
 	p.SetFactory(nop.Factory)
@@ -18,10 +18,10 @@ func TestHS103Plug(t *testing.T) {
 		t.Error(err)
 	}
 
-	f := HS103Factory()
+	f := tasmotaFactory()
 
 	params := map[string]interface{}{
-		"Address": "http://192.168.1.5:9999",
+		"Address": "http://192.168.0.60",
 	}
 
 	d, err := f.NewDriver(params, nil)
